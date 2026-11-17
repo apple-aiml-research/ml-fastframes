@@ -1,0 +1,150 @@
+{
+  "description": "Raw VBench dimension scores behind Table 1 (fractions in [0, 1]) and the reported Total/Quality/Semantic.",
+  "rows": {
+    "CausVid": {
+      "prompt_conditioning": "VBench's GPT-enhanced prompts (all_dimension_longer.txt, also shipped by CausVid)",
+      "paper_total_quality_semantic": [
+        83.18,
+        84.15,
+        79.31
+      ],
+      "total_score": 0.8318309404957599,
+      "quality_score": 0.8415059540380975,
+      "semantic_score": 0.7931308863264095,
+      "raw_scores": {
+        "subject consistency": 0.9568289991975243,
+        "background consistency": 0.9511123337856559,
+        "motion smoothness": 0.9795878089740694,
+        "dynamic degree": 0.6361111111111111,
+        "aesthetic quality": 0.660098595324383,
+        "imaging quality": 0.68525340494419,
+        "object class": 0.9465189873417722,
+        "multiple objects": 0.8275914634146342,
+        "color": 0.8572848951995872,
+        "spatial relationship": 0.7654421433962432,
+        "scene": 0.5329941860465116,
+        "temporal style": 0.2487205805182457,
+        "overall consistency": 0.2605114003022512,
+        "human action": 0.942,
+        "appearance style": 0.21494704432441586,
+        "temporal flickering": 0.9942880505206542
+      }
+    },
+    "Self-Forcing": {
+      "prompt_conditioning": "Self-Forcing extended prompts",
+      "paper_total_quality_semantic": [
+        84.1,
+        84.84,
+        81.13
+      ],
+      "total_score": 0.8409824405276168,
+      "quality_score": 0.8484021225400288,
+      "semantic_score": 0.8113037124779692,
+      "raw_scores": {
+        "subject consistency": 0.9539819891357587,
+        "background consistency": 0.9630346821629724,
+        "motion smoothness": 0.9837299534740784,
+        "dynamic degree": 0.6722222222222223,
+        "aesthetic quality": 0.6565845964416381,
+        "imaging quality": 0.6961316997528582,
+        "object class": 0.9367088607594937,
+        "multiple objects": 0.8861280487804878,
+        "color": 0.8582088815139665,
+        "spatial relationship": 0.8110785475481062,
+        "scene": 0.5886627906976745,
+        "temporal style": 0.24320398595929146,
+        "overall consistency": 0.26808291330773343,
+        "human action": 0.97,
+        "appearance style": 0.2055314278978044,
+        "temporal flickering": 0.9914655392596234
+      }
+    },
+    "Causal Forcing++": {
+      "prompt_conditioning": "Self-Forcing extended prompts",
+      "paper_total_quality_semantic": [
+        84.11,
+        85.09,
+        80.2
+      ],
+      "total_score": 0.84110621559329,
+      "quality_score": 0.8508833694164307,
+      "semantic_score": 0.8019976003007273,
+      "raw_scores": {
+        "subject consistency": 0.9587257369302418,
+        "background consistency": 0.9639275768191315,
+        "motion smoothness": 0.9830528694174576,
+        "dynamic degree": 0.6333333333333333,
+        "aesthetic quality": 0.6700415158784517,
+        "imaging quality": 0.7101311153947129,
+        "object class": 0.9620253164556962,
+        "multiple objects": 0.8522865853658537,
+        "color": 0.9063971105941909,
+        "spatial relationship": 0.7773605489712271,
+        "scene": 0.5579941860465116,
+        "temporal style": 0.2445052569806576,
+        "overall consistency": 0.2634329581132499,
+        "human action": 0.958,
+        "appearance style": 0.1966519397290816,
+        "temporal flickering": 0.992827441463421
+      }
+    },
+    "FastFrames-S": {
+      "prompt_conditioning": "Self-Forcing extended prompts",
+      "paper_total_quality_semantic": [
+        84.23,
+        85.3,
+        79.92
+      ],
+      "total_score": 0.8422670347127083,
+      "quality_score": 0.8530376750120363,
+      "semantic_score": 0.799184473515396,
+      "raw_scores": {
+        "subject consistency": 0.9630989407101235,
+        "background consistency": 0.966615877373274,
+        "motion smoothness": 0.9855848606229032,
+        "dynamic degree": 0.6277777777777778,
+        "aesthetic quality": 0.6707401407021348,
+        "imaging quality": 0.7042253889820419,
+        "object class": 0.9606012658227848,
+        "multiple objects": 0.8522865853658537,
+        "color": 0.8964025710062296,
+        "spatial relationship": 0.775144622528518,
+        "scene": 0.5545058139534884,
+        "temporal style": 0.24355440852046012,
+        "overall consistency": 0.26298657098124106,
+        "human action": 0.952,
+        "appearance style": 0.197334314986283,
+        "temporal flickering": 0.9945102434164739
+      }
+    },
+    "FastFrames-L": {
+      "prompt_conditioning": "Self-Forcing extended prompts",
+      "paper_total_quality_semantic": [
+        84.44,
+        85.48,
+        80.29
+      ],
+      "total_score": 0.8444201842063228,
+      "quality_score": 0.8548008654934462,
+      "semantic_score": 0.8028974590578292,
+      "raw_scores": {
+        "subject consistency": 0.9679891055460185,
+        "background consistency": 0.9703126703306686,
+        "motion smoothness": 0.9880584052894213,
+        "dynamic degree": 0.6194444444444445,
+        "aesthetic quality": 0.6662915735475479,
+        "imaging quality": 0.7013593045382422,
+        "object class": 0.9563291139240506,
+        "multiple objects": 0.8821646341463415,
+        "color": 0.8189362200299699,
+        "spatial relationship": 0.8114785440350731,
+        "scene": 0.5469476744186047,
+        "temporal style": 0.2433191604614258,
+        "overall consistency": 0.26471930820775286,
+        "human action": 0.988,
+        "appearance style": 0.2024633766289453,
+        "temporal flickering": 0.995890411478553
+      }
+    }
+  }
+}

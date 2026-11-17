@@ -1,0 +1,12 @@
+__pycache__/
+*.egg-info/
+.venv/
+/checkpoints/
+/outputs/
+/evaluation/vbench/VBench/vbench/
+/evaluation/vbench/.venv-vbench/
+/data/prompts/vidprom_filtered_extended.txt
+/data/real_videos/
+/results/
+/runs/
+/upstream/
