@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FastFrames: Video Generation at Interactive Latency. Explore our interactive demo and video comparisons for FastFrames-S (1.3B) and FastFrames-L (14B).">
+  <!-- Link previews (Open Graph, X/Twitter card): page title, short description and the demo's title card. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="FastFrames">
+  <meta property="og:title" content="FastFrames: Video Generation at Interactive Latency">
+  <meta property="og:description" content="Explore our interactive demo and video comparisons for FastFrames-S (1.3B) and FastFrames-L (14B).">
+  <meta property="og:url" content="https://apple-aiml-research.github.io/ml-fastframes/">
+  <meta property="og:image" content="https://apple-aiml-research.github.io/ml-fastframes/static/posters/interactive/fastframes_demo_923.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1920">
+  <meta property="og:image:height" content="1080">
+  <meta property="og:image:alt" content="Interactive world models with FastFrames: each demo runs a model's official implementation and the same model with FastFrames optimizations, given the same input at the same time. Demos: LingBot (keyboard navigation) and RealWonder (physics-based dragging).">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FastFrames: Video Generation at Interactive Latency">
+  <meta name="twitter:description" content="Explore our interactive demo and video comparisons for FastFrames-S (1.3B) and FastFrames-L (14B).">
+  <meta name="twitter:image" content="https://apple-aiml-research.github.io/ml-fastframes/static/posters/interactive/fastframes_demo_923.jpg">
+  <meta name="twitter:image:alt" content="Interactive world models with FastFrames: each demo runs a model's official implementation and the same model with FastFrames optimizations, given the same input at the same time. Demos: LingBot (keyboard navigation) and RealWonder (physics-based dragging).">
+  <link rel="canonical" href="https://apple-aiml-research.github.io/ml-fastframes/">
+  <title>FastFrames: Video Generation at Interactive Latency</title>
+  <link rel="icon" href="./static/favicon.ico?v=0c4889914f3f" sizes="16x16 32x32 48x48">
+  <link rel="icon" type="image/png" sizes="32x32" href="./static/favicon-32.png?v=ff6406c936ee">
+  <link rel="icon" type="image/png" sizes="192x192" href="./static/favicon-192.png?v=e0888e0365f0">
+  <link rel="icon" type="image/svg+xml" href="./static/favicon.svg?v=12782efe7d78">
+  <link rel="apple-touch-icon" sizes="180x180" href="./static/apple-touch-icon.png?v=ebee619f1a12">
+  <link rel="stylesheet" href="./static/css/site.bundle.css?v=3">
+  <!-- Without JavaScript, the comparison posters (otherwise set by release.js) as the videos' backgrounds. -->
+  <noscript><link rel="stylesheet" href="./static/css/noscript.css?v=1"></noscript>
+  <script src="./static/js/comparison.js?v=3" defer></script>
+  <script src="./static/js/toc.js?v=toc-3" defer></script>
+  <script src="./static/js/release.js?v=6" defer></script>
+</head>
+<body>
+<nav class="page-toc" aria-label="On this page">
+  <a class="page-toc-item" href="#overview"><span class="page-toc-dot" aria-hidden="true"></span><span class="page-toc-label">Overview</span></a>
+  <a class="page-toc-item" href="#interactive-demo"><span class="page-toc-dot" aria-hidden="true"></span><span class="page-toc-label">Interactive Demo</span></a>
+  <a class="page-toc-item" href="#abstract"><span class="page-toc-dot" aria-hidden="true"></span><span class="page-toc-label">Abstract</span></a>
+  <a class="page-toc-item" href="#quality-latency"><span class="page-toc-dot" aria-hidden="true"></span><span class="page-toc-label">Quality–Latency</span></a>
+  <a class="page-toc-item" href="#inference-pipeline"><span class="page-toc-dot" aria-hidden="true"></span><span class="page-toc-label">Pipeline</span></a>
+  <a class="page-toc-item" href="#t2v-qualitative-comparisons"><span class="page-toc-dot" aria-hidden="true"></span><span class="page-toc-label">T2V Comparisons</span></a>
+  <a class="page-toc-item" href="#BibTeX"><span class="page-toc-dot" aria-hidden="true"></span><span class="page-toc-label">BibTeX</span></a>
+</nav>
+<main>
+
+<section class="hero publication-header" id="overview">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title"><span class="title-brand">FastFrames</span>: Video Generation<br class="title-line-break"> at Interactive Latency</h1>
+          <div class="is-size-5 publication-authors" role="group" aria-label="Authors">
+            <span class="author-block"><a href="https://genechou.com/">Gene Chou</a><sup>1,2</sup>,</span>
+            <span class="author-block"><a href="https://www.guandaoyang.com/">Guandao Yang</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="https://scholar.google.com/citations?user=NLxrmYQAAAAJ&amp;hl=en">Fujun Luan</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="https://scholar.google.com/citations?user=h2k1gL4AAAAJ&amp;hl=en">Lars Mescheder</a><sup>1</sup>,</span>
+            <br class="author-line-break">
+            <span class="author-block"><a href="https://dongwei.info/">Wei Dong</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="http://www.stephanrichter.org/">Stephan R. Richter</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="https://vladlen.info/">Vladlen Koltun</a><sup>1</sup></span>
+          </div>
+          <div class="is-size-5 publication-authors publication-affiliations">
+            <span class="author-block"><img class="affiliation-logo logo-apple" src="./static/logos/apple.svg" width="13" height="16" alt="" aria-hidden="true"><sup>1</sup>Apple,</span> <span class="author-block"><img class="affiliation-logo logo-cornell" src="./static/logos/cornell-insignia.png" width="17" height="17" alt="" aria-hidden="true"><sup>2</sup>Cornell University</span>
+          </div>
+          <div class="column has-text-centered">
+            <div class="publication-links" role="group" aria-label="Project resources">
+            <!-- Replace the paper placeholder when the arXiv URL is ready. -->
+            <span class="link-block">
+            <button class="button is-normal is-dark is-rounded resource-placeholder" type="button" disabled aria-label="Paper (coming soon)" title="Paper coming soon">
+              <span class="icon" aria-hidden="true"><svg viewBox="0 0 384 512" fill="currentColor"><path d="M369.9 97.9 286 14.1A48 48 0 0 0 252.1 0H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM256 52l76 76h-76V52zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48z"/><path d="M107 344h30c29 0 44-15 44-39s-15-39-44-39h-30zm23-20v-38h7c14 0 20 6 20 19s-6 19-20 19zm60 20h30c35 0 51-16 51-40s-16-38-51-38h-30zm23-20v-38h6c18 0 27 5 27 18s-9 20-27 20zm67 20h23v-29h24v-20h-24v-9h27v-20h-50z"/></svg></span>
+              <span>Paper</span>
+            </button>
+            </span>
+            <span class="link-block">
+            <a class="button is-normal is-dark is-rounded" href="https://github.com/apple-aiml-research/ml-fastframes" aria-label="Code on GitHub">
+              <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-14-4 18"/></svg></span>
+              <span>Code</span>
+            </a>
+            </span>
+            </div>
+          </div>
+          <aside class="tldr-card" aria-labelledby="tldr-label">
+            <p class="tldr-label" id="tldr-label">TL;DR</p>
+            <p>FastFrames-S (1.3B) and FastFrames-L (14B) are autoregressive video diffusion models that generate 480p video at interactive latency (&lt;50 ms). <a href="https://github.com/robbyant/lingbot-world-v2">LingBot 1.3B</a> optimized with FastFrames delivers a 16× speedup for fluid camera-conditioned control.</p>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-light is-small interactive-section" id="interactive-demo">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Interactive Demo</h2>
+    <video class="interactive-video" controls playsinline preload="none" poster="./static/posters/interactive/fastframes_demo_923.webp?v=f15cf0bf9c53" aria-label="Interactive Demo" aria-describedby="demo-caption">
+      <source src="./static/videos/interactive/fastframes_demo_923.mp4?v=91550a8cf343" type="video/mp4">
+      Your browser does not support embedded video. <a href="./static/videos/interactive/fastframes_demo_923.mp4">Watch the demo MP4.</a>
+    </video>
+    <p class="demo-caption" id="demo-caption">Each demo runs a model's official implementation (left) and the same model with FastFrames optimizations (right), given the exact same input at the exact same time: LingBot with keyboard navigation and RealWonder with physics-based dragging.</p>
+  </div>
+</section>
+
+<section class="section abstract-section" id="abstract">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 has-text-centered">Abstract</h2>
+        <div class="content abstract-copy">
+          <p>Autoregressive video diffusion models generate frames based on new observations and inputs, making them a promising medium for interactive visual experiences. However, existing models are at least an order of magnitude too slow for fluid interaction. This paper introduces FastFrames, a family of fast autoregressive video diffusion models that achieves interactive latency without compromising quality.</p>
+          <p>We profile the inference pipeline of state-of-the-art models and find that operations often treated as fixed implementation details, such as VAE decoding and KV cache updates, in fact account for over half of end-to-end inference latency. We challenge the assumption that these components are indispensable and replace them with lightweight alternatives.</p>
+          <p>Our 1.3B variant runs at 36&nbsp;ms per frame, or 28 responses per second (RPS), on a single B200 GPU while matching the generation quality of a state-of-the-art model that is nearly 8× slower. Our 14B variant runs at 45&nbsp;ms per frame, or 22 RPS, on an 8× B200 GPU node and yields significantly better visual quality and realism.</p>
+          <p>We show that FastFrames enables real-time interaction in applications such as camera-conditioned and physics-conditioned video generation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section paper-section section-muted" id="quality-latency">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Quality–Latency Tradeoff</h2>
+    <figure class="paper-figure pareto-figure">
+      <a class="paper-image-link" href="./static/figures/figure1-pareto.svg" target="_blank" rel="noopener" aria-label="Open Figure 1 at full size in a new tab">
+        <img src="./static/figures/figure1-pareto.svg?v=2" width="2403" height="2208" loading="lazy" decoding="async" alt="VBench quality versus generation latency. FastFrames-S on one GPU and FastFrames-L on eight GPUs reach the interactive regime of 50 milliseconds or less while matching or exceeding comparable baselines in quality.">
+      </a>
+      <figcaption><strong>Figure 1.</strong> Quality–latency Pareto frontier. Higher VBench scores and lower latency are better; the shaded region marks the interactive target of ≤50 ms.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="section paper-section" id="inference-pipeline">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Inference Pipeline and Latency Profiling</h2>
+    <figure class="paper-figure pipeline-figure">
+      <a class="paper-image-link" href="./static/figures/figure2-pipeline.svg" target="_blank" rel="noopener" aria-label="Open Figure 2 at full size in a new tab">
+        <img src="./static/figures/figure2-pipeline.svg" width="1584" height="1183" loading="lazy" decoding="async" alt="Baseline and FastFrames inference pipelines. Lightweight KV cache refinement and a pixel decoder replace expensive cache writes and VAE decoding. The profiling bars show latency falling from 271.8 to 35.8 milliseconds.">
+      </a>
+      <figcaption><strong>Figure 2.</strong> Inference pipeline and latency profiling for one autoregressive generation. FastFrames replaces expensive KV cache updates and VAE decoding with lightweight alternatives, and accelerates diffusion sampling with systems optimizations.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="section comparison-section section-muted" id="t2v-qualitative-comparisons">
+  <div class="comparison-container">
+    <h2 class="title is-3">T2V Qualitative Comparisons</h2>
+    <div class="comparison-description">
+      <p>A random selection of prompts and generated videos. Click on &quot;Prompt&quot; to view the text conditions.</p>
+      <p>FastFrames-S preserves the visual quality of CF++ while being nearly 8× faster. FastFrames-L achieves realism, prompt adherence, composition, and text-rendering capabilities comparable to Krea-Realtime while being over 10× faster. Compared with their 1.3B counterparts, the 14B models (FastFrames-L and Krea-Realtime) produce more realistic lighting and shadows, more coherent compositions, and more legible text.</p>
+      <p class="latency-note">Clock labels show end-to-end latency for one generation unit at steady state and at 480p on NVIDIA B200 GPUs.</p>
+    </div>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>A macro shot of a man in an antique scuba helmet with dark glass lenses, walking out of a colorful flower bed. The man&#x27;s weathered face and rugged hands are clearly visible through the helmet. His posture is slightly stooped, and he appears to be in deep concentration. The flower bed is filled with a variety of blooming flowers, their petals soft and vibrant, creating a lush and vivid backdrop. The camera angle is from below, capturing the man&#x27;s entire figure as he emerges from the flowers, with the petals gently falling around him. The image has a vintage, almost nostalgic quality, with a focus on the intricate details of both the man and the flowers. A macro shot with a slightly downward angle.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 1">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.mp4" data-poster="./static/posters/cfpp/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.jpg" data-src="./static/videos/cfpp/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.mp4" data-poster="./static/posters/ours13/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.jpg" data-src="./static/videos/ours13/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.mp4" data-poster="./static/posters/krea/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.jpg" data-src="./static/videos/krea/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.mp4" data-poster="./static/posters/ours14/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.jpg" data-src="./static/videos/ours14/p0092_seed92000276_a-macro-shot-of-a-man-in-an-antique-scuba-helmet-with-dark-glass-lenses_db374bad88.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>Late autumn in a cozy café, a woman in a burgundy sweater and gold earrings fills the foreground in UHD. She stirs coffee slowly, then smiles as she watches leaves tumble past the window and rain streaks the glass. The camera pushes in to capture steam curling around her face, then eases back to show warm lamps, glossy pastries, and wet pavement reflecting city lights outside. Crisp fabric detail, natural skin tones, and subtle film grain create a calm, cinematic mood.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 2">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.mp4" data-poster="./static/posters/cfpp/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.jpg" data-src="./static/videos/cfpp/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.mp4" data-poster="./static/posters/ours13/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.jpg" data-src="./static/videos/ours13/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.mp4" data-poster="./static/posters/krea/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.jpg" data-src="./static/videos/krea/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.mp4" data-poster="./static/posters/ours14/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.jpg" data-src="./static/videos/ours14/p0048_seed48000144_late-autumn-in-a-cozy-caf-a-woman-in-a-burgundy-sweater-and-gold-earring_f30da66eea.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>In late autumn inside a greenhouse, a gardener in a soft cardigan and floral apron fills the foreground in cinematic 4K. She trims a rose, then mists the leaves as the camera moves close to droplets hanging from petals. Outside the glass, rain falls and trees turn bronze, while inside warm light makes everything glow. Crisp textures, true tones, and gentle film grain create a cozy, intimate beauty.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 3">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.mp4" data-poster="./static/posters/cfpp/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.jpg" data-src="./static/videos/cfpp/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.mp4" data-poster="./static/posters/ours13/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.jpg" data-src="./static/videos/ours13/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.mp4" data-poster="./static/posters/krea/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.jpg" data-src="./static/videos/krea/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.mp4" data-poster="./static/posters/ours14/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.jpg" data-src="./static/videos/ours14/p0031_seed31000093_in-late-autumn-inside-a-greenhouse-a-gardener-in-a-soft-cardigan-and-flo_b8dfabeaaf.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>A cinematic pov walkthrough in a winter wonderland style of the frozen streets of Manhattan, New York City. The camera moves slowly down the street, capturing the serene and tranquil atmosphere. The trees are covered in a thick layer of ice and snow, their branches heavy with frost. The Empire State Building stands tall and majestic, its structure glistening with ice crystals, reflecting the pale winter sunlight. The cityscape is bathed in a soft, ethereal light, with a slight mist creating a dreamlike effect. Snowflakes gently fall, adding to the magical ambiance. A wide-angle shot with the camera moving from the street to the iconic building.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 4">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.mp4" data-poster="./static/posters/cfpp/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.jpg" data-src="./static/videos/cfpp/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.mp4" data-poster="./static/posters/ours13/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.jpg" data-src="./static/videos/ours13/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.mp4" data-poster="./static/posters/krea/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.jpg" data-src="./static/videos/krea/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.mp4" data-poster="./static/posters/ours14/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.jpg" data-src="./static/videos/ours14/p0090_seed90000270_a-cinematic-pov-walkthrough-in-a-winter-wonderland-style-of-the-frozen-s_4ae59ffeda.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>A realistic photo of a llama wearing colorful pajamas dancing energetically on a stage under vibrant disco lighting. The llama has large floppy ears and a playful expression, moving its legs in a lively dance. It wears a red and yellow striped pajama top and matching pajama pants, with a fluffy tail swaying behind it. The stage is adorned with glittering disco balls and colorful lights, casting a lively and joyful atmosphere. The background features blurred audience members and a backdrop with disco-themed decorations. A dynamic shot capturing the llama mid-dance from a slightly elevated angle.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 5">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.mp4" data-poster="./static/posters/cfpp/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.jpg" data-src="./static/videos/cfpp/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.mp4" data-poster="./static/posters/ours13/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.jpg" data-src="./static/videos/ours13/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.mp4" data-poster="./static/posters/krea/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.jpg" data-src="./static/videos/krea/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.mp4" data-poster="./static/posters/ours14/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.jpg" data-src="./static/videos/ours14/p0094_seed94000282_a-realistic-photo-of-a-llama-wearing-colorful-pajamas-dancing-energetica_883aca6a2f.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>A serene cinematic aerial descent over a broad black-sand beach at blue hour, where a thin silver tide advances beneath a lavender sky and distant cliffs disappear into mist. The camera lowers toward the shoreline as one smooth wave curls, spreads into lace-like foam, and retreats with unusual precision, leaving bright white strokes across the untouched wet sand. The foam and water must render the exact text &quot;STAY CURIOUS&quot; in very large, crisp uppercase letters, with accurate spelling, a distinct space between the words, and every character readable from the final overhead view. The phrase remains intact while shallow water glimmers around it, then a second gentle wave traces the letter edges without changing their shapes. Two tiny seabirds cross the upper frame and the camera holds perfectly still for a clear reading. No footprints, signs, or other readable text are present.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 6">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.mp4" data-poster="./static/posters/cfpp/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.jpg" data-src="./static/videos/cfpp/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.mp4" data-poster="./static/posters/ours13/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.jpg" data-src="./static/videos/ours13/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.mp4" data-poster="./static/posters/krea/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.jpg" data-src="./static/videos/krea/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.mp4" data-poster="./static/posters/ours14/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.jpg" data-src="./static/videos/ours14/p0103_seed103000309_a-serene-cinematic-aerial-descent-over-a-broad-black-sand-beach-at-blue_66b82ebcab.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>A serene watercolor painting of a mother duck leading her six ducklings across a tranquil pond. The mother duck has a gentle expression, her feathers glistening in the sunlight, and she frequently glances back to ensure all her ducklings are safely following in a neat little line. The ducklings follow closely behind, their small heads bobbing up and down as they waddle along. The background features a peaceful pond with lily pads and ducks floating nearby, creating a harmonious and natural scene. A mid-shot from a slightly elevated angle captures the mother duck and her ducklings in motion.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 7">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.mp4" data-poster="./static/posters/cfpp/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.jpg" data-src="./static/videos/cfpp/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.mp4" data-poster="./static/posters/ours13/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.jpg" data-src="./static/videos/ours13/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.mp4" data-poster="./static/posters/krea/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.jpg" data-src="./static/videos/krea/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.mp4" data-poster="./static/posters/ours14/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.jpg" data-src="./static/videos/ours14/p0073_seed73000219_a-serene-watercolor-painting-of-a-mother-duck-leading-her-six-ducklings_add7c941f9.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>Autumn twilight on a city bridge, a woman in a deep navy coat and red gloves stands large in frame, HDR 4K. She checks a folded letter, exhales softly, then pockets it and walks forward as the camera glides beside her face. Behind her, river water turns dark and reflective, trees along the embankment glow bronze, and streetlights stretch into shimmering lines. Fabric folds, breath mist, and wet stone reflections are sharp, cinematic, and haunting.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 8">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.mp4" data-poster="./static/posters/cfpp/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.jpg" data-src="./static/videos/cfpp/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.mp4" data-poster="./static/posters/ours13/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.jpg" data-src="./static/videos/ours13/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.mp4" data-poster="./static/posters/krea/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.jpg" data-src="./static/videos/krea/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.mp4" data-poster="./static/posters/ours14/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.jpg" data-src="./static/videos/ours14/p0016_seed16000048_autumn-twilight-on-a-city-bridge-a-woman-in-a-deep-navy-coat-and-red-glo_6415a3e67a.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>Beneath a mountain aurora in Lapland, a photographer in a crimson parka with fur hood and frost-dusted eyelashes dominates the frame in ultra-realistic 4K. First, he adjusts a tripod and warms his hands over a small camp lantern, breath turning to glittering mist. Then he clicks the shutter and spins to gesture at the sky, the camera panning up as green ribbons ripple above snowy pines, ice crystals sharp, and the night breathtakingly vivid. far from any city lights. for one long moment.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 9">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.mp4" data-poster="./static/posters/cfpp/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.jpg" data-src="./static/videos/cfpp/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.mp4" data-poster="./static/posters/ours13/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.jpg" data-src="./static/videos/ours13/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.mp4" data-poster="./static/posters/krea/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.jpg" data-src="./static/videos/krea/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.mp4" data-poster="./static/posters/ours14/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.jpg" data-src="./static/videos/ours14/p0017_seed17000051_beneath-a-mountain-aurora-in-lapland-a-photographer-in-a-crimson-parka-w_a2be44a13f.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>High in a Himalayan monastery courtyard, a monk in a deep maroon robe and turquoise beads fills the frame in cinematic 4K with crisp stone textures and thin mountain air. First, he rings a small bell and watches prayer flags snap in the wind, clouds rolling past ridgelines. Then he begins a slow walking meditation, palms together, and turns toward the open gate as the camera cranes up, revealing snow peaks, golden roofs, and a sky that feels endless. in slow motion.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 10">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.mp4" data-poster="./static/posters/cfpp/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.jpg" data-src="./static/videos/cfpp/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.mp4" data-poster="./static/posters/ours13/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.jpg" data-src="./static/videos/ours13/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.mp4" data-poster="./static/posters/krea/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.jpg" data-src="./static/videos/krea/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.mp4" data-poster="./static/posters/ours14/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.jpg" data-src="./static/videos/ours14/p0020_seed20000060_high-in-a-himalayan-monastery-courtyard-a-monk-in-a-deep-maroon-robe-and_76b8f8cd3b.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>In a high desert observatory, an astronomer in a dark wool coat and silver scarf stands large in the shot, cinematic 4K with crisp metal and glass highlights. First, she aligns the telescope and taps a notebook, lips moving as she counts seconds in the cold air. Then she looks through the eyepiece, gasps softly, and turns to gesture upward as the camera pans to a dense Milky Way, stars razor sharp, the horizon silent and immense. with a steady, floating camera.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 11">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.mp4" data-poster="./static/posters/cfpp/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.jpg" data-src="./static/videos/cfpp/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.mp4" data-poster="./static/posters/ours13/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.jpg" data-src="./static/videos/ours13/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.mp4" data-poster="./static/posters/krea/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.jpg" data-src="./static/videos/krea/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.mp4" data-poster="./static/posters/ours14/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.jpg" data-src="./static/videos/ours14/p0024_seed24000072_in-a-high-desert-observatory-an-astronomer-in-a-dark-wool-coat-and-silve_31f57c8273.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>At a rooftop garden above Seoul at night, a violinist in a black velvet coat and sparkling hairpin stands prominent in ultra-realistic 4K with city lights bokeh. First, she tightens one string and holds still as a breeze lifts her coat hem, distant traffic humming. Then she draws the bow into a bright phrase and takes two steps forward, the camera drifting closer as skyscrapers glitter behind her and lanterns glow, textures rich and the mood intensely alive. while the skyline shimmers softly.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 12">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.mp4" data-poster="./static/posters/cfpp/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.jpg" data-src="./static/videos/cfpp/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.mp4" data-poster="./static/posters/ours13/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.jpg" data-src="./static/videos/ours13/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.mp4" data-poster="./static/posters/krea/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.jpg" data-src="./static/videos/krea/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.mp4" data-poster="./static/posters/ours14/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.jpg" data-src="./static/videos/ours14/p0005_seed5000015_at-a-rooftop-garden-above-seoul-at-night-a-violinist-in-a-black-velvet-c_71cd91bfc1.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>Autumn morning on a moorland trail, a woman in a long tweed coat and emerald scarf stands close to camera in cinematic 4K. She checks a brass compass, steps forward into drifting fog, then pauses as wind tugs her hair and heather bends low. The camera tracks beside her profile, revealing a distant stone ruin emerging for a moment, then dissolving again into mist. Sharp fabric texture, true tones, and subtle film grain create an ancient, mesmerizing atmosphere without any ritual cues.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 13">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.mp4" data-poster="./static/posters/cfpp/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.jpg" data-src="./static/videos/cfpp/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.mp4" data-poster="./static/posters/ours13/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.jpg" data-src="./static/videos/ours13/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.mp4" data-poster="./static/posters/krea/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.jpg" data-src="./static/videos/krea/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.mp4" data-poster="./static/posters/ours14/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.jpg" data-src="./static/videos/ours14/p0013_seed13000039_autumn-morning-on-a-moorland-trail-a-woman-in-a-long-tweed-coat-and-emer_214fc7b98b.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>In late autumn in a museum hall, a curator in a dark blazer and silk scarf dominates the frame in cinematic 4K. She adjusts a spotlight on a sculpture, then steps back as the camera holds close on her thoughtful face and polished marble reflections. Outside tall windows, rain falls and leaves whirl in wind. True tones, sharp textures, and gentle film grain create a calm, elegant atmosphere.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 14">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.mp4" data-poster="./static/posters/cfpp/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.jpg" data-src="./static/videos/cfpp/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.mp4" data-poster="./static/posters/ours13/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.jpg" data-src="./static/videos/ours13/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.mp4" data-poster="./static/posters/krea/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.jpg" data-src="./static/videos/krea/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.mp4" data-poster="./static/posters/ours14/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.jpg" data-src="./static/videos/ours14/p0030_seed30000090_in-late-autumn-in-a-museum-hall-a-curator-in-a-dark-blazer-and-silk-scar_93263d6ee8.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>In late autumn on a coastal highway lookout, a motorcyclist in a matte helmet and orange rain suit fills the foreground in cinematic 4K. He slows, removes a glove to feel the wind, then watches waves explode against cliffs as the camera tracks tight along wet asphalt reflections. Behind him, dark clouds race and leaves cling to the guardrail. Crisp textures, natural grading, and subtle film grain make the moment intense and cinematic.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 15">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.mp4" data-poster="./static/posters/cfpp/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.jpg" data-src="./static/videos/cfpp/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.mp4" data-poster="./static/posters/ours13/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.jpg" data-src="./static/videos/ours13/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.mp4" data-poster="./static/posters/krea/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.jpg" data-src="./static/videos/krea/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.mp4" data-poster="./static/posters/ours14/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.jpg" data-src="./static/videos/ours14/p0033_seed33000099_in-late-autumn-on-a-coastal-highway-lookout-a-motorcyclist-in-a-matte-he_f6d6439298.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>In late autumn on a stone bridge in an old town, a man in a charcoal coat and patterned scarf dominates the frame in cinematic 4K. He carries roasted chestnuts, then pauses under a lantern as steam curls into cool air. The camera pushes close to his relaxed smile, then reveals ginkgo leaves blanketing wet cobblestones and warm window light reflecting on puddles. Sharp textures, true tones, and gentle film grain make the season feel intimate and cinematic.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 16">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.mp4" data-poster="./static/posters/cfpp/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.jpg" data-src="./static/videos/cfpp/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.mp4" data-poster="./static/posters/ours13/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.jpg" data-src="./static/videos/ours13/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.mp4" data-poster="./static/posters/krea/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.jpg" data-src="./static/videos/krea/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.mp4" data-poster="./static/posters/ours14/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.jpg" data-src="./static/videos/ours14/p0036_seed36000108_in-late-autumn-on-a-stone-bridge-in-an-old-town-a-man-in-a-charcoal-coat_45aa455642.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>Inside a Seoul hanok courtyard with falling snow, a tea master in a charcoal hanbok and silver hairpin fills the foreground in cinematic 4K with crisp wood grain. First, she warms a teapot over coals and steadies the cup with both hands, listening to snow hush the world. Then she pours in a slow stream, raises the cup to her lips, and smiles at the camera as it drifts back, revealing lantern glow, white roofs, and a scene tender and intimate.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 17">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.mp4" data-poster="./static/posters/cfpp/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.jpg" data-src="./static/videos/cfpp/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.mp4" data-poster="./static/posters/ours13/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.jpg" data-src="./static/videos/ours13/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.mp4" data-poster="./static/posters/krea/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.jpg" data-src="./static/videos/krea/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.mp4" data-poster="./static/posters/ours14/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.jpg" data-src="./static/videos/ours14/p0044_seed44000132_inside-a-seoul-hanok-courtyard-with-falling-snow-a-tea-master-in-a-charc_2bbdeda216.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>On a winter sunrise in a Scandinavian village, a woman in a thick blue coat and patterned mittens dominates the frame in UHD. She pulls a sled of firewood, then pauses to watch light spill over frozen rooftops and drifting chimney smoke. The camera tracks backward, keeping her large while an icy fjord and distant mountains glow pale pink. Crisp snow texture, natural skin tones, and subtle film grain make the cold morning feel cozy and grand.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 18">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.mp4" data-poster="./static/posters/cfpp/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.jpg" data-src="./static/videos/cfpp/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.mp4" data-poster="./static/posters/ours13/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.jpg" data-src="./static/videos/ours13/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.mp4" data-poster="./static/posters/krea/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.jpg" data-src="./static/videos/krea/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.mp4" data-poster="./static/posters/ours14/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.jpg" data-src="./static/videos/ours14/p0061_seed61000183_on-a-winter-sunrise-in-a-scandinavian-village-a-woman-in-a-thick-blue-co_bf407e4838.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>A drone view of waves crashing against the rugged cliffs along Big Sur’s Garay Point beach. The crashing blue waters create white-tipped waves, while the golden light of the setting sun illuminates the rocky shore, casting long shadows. In the distance, a small island with a lighthouse stands tall, its beam piercing the twilight. Green shrubbery covers the cliff’s edge, and the steep drop from the road down to the beach is a dramatic feat, with the cliff’s edges jutting out over the sea. The camera angle provides a bird&#x27;s-eye view, capturing the raw beauty of the coast and the rugged landscape of the Pacific Coast Highway. The scene is bathed in a warm, golden hue, highlighting the textures and details of the rocky terrain.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 19">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.mp4" data-poster="./static/posters/cfpp/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.jpg" data-src="./static/videos/cfpp/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.mp4" data-poster="./static/posters/ours13/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.jpg" data-src="./static/videos/ours13/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.mp4" data-poster="./static/posters/krea/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.jpg" data-src="./static/videos/krea/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.mp4" data-poster="./static/posters/ours14/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.jpg" data-src="./static/videos/ours14/p0075_seed75000225_a-drone-view-of-waves-crashing-against-the-rugged-cliffs-along-big-sur-s_f13bf1e16f.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>A slow-motion shot of a fiery volcanic landscape, with molten lava erupting from deep craters. The camera flies through the lava, capturing the intense heat and dramatic splashes as they hit the lens. The lighting is cinematic and moody, casting dramatic shadows and highlighting the vivid orange and red hues. The color grade is high-contrast and dramatic, emphasizing the raw power of the eruption. The background features towering cliffs and dense smoke, creating a sense of awe and danger. A dynamic overhead view, providing a thrilling and immersive experience.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 20">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.mp4" data-poster="./static/posters/cfpp/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.jpg" data-src="./static/videos/cfpp/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.mp4" data-poster="./static/posters/ours13/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.jpg" data-src="./static/videos/ours13/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.mp4" data-poster="./static/posters/krea/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.jpg" data-src="./static/videos/krea/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.mp4" data-poster="./static/posters/ours14/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.jpg" data-src="./static/videos/ours14/p0085_seed85000255_a-slow-motion-shot-of-a-fiery-volcanic-landscape-with-molten-lava-erupti_3a96aeddab.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>A photorealistic winter-night view from inside an old passenger train, focused on a large window clouded by breath and edged with intricate frost crystals. Outside, dark pine trees and distant amber station lights slide past in soft bokeh while the camera moves slowly toward the glass. An unseen fingertip wipes a narrow path through the condensation, and delicate ice crystals immediately regrow in controlled strokes across the cleared area. The frost must render the exact text &quot;NORTH STAR&quot; in large, sharply defined uppercase letters, with both words spelled correctly, separated clearly, and remaining stable and fully legible despite the train&#x27;s gentle vibration. Moonlight catches the icy letter edges as the camera shifts slightly sideways, showing their raised crystalline texture without distorting the phrase. The rest of the window contains only natural frost patterns, with no signs or other readable text visible inside or outside the train.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 21">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.mp4" data-poster="./static/posters/cfpp/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.jpg" data-src="./static/videos/cfpp/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.mp4" data-poster="./static/posters/ours13/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.jpg" data-src="./static/videos/ours13/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.mp4" data-poster="./static/posters/krea/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.jpg" data-src="./static/videos/krea/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.mp4" data-poster="./static/posters/ours14/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.jpg" data-src="./static/videos/ours14/p0106_seed106000318_a-photorealistic-winter-night-view-from-inside-an-old-passenger-train-fo_6f0b3dc40f.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+    <article class="comparison-group">
+      <div class="comparison-toolbar">
+        <details class="prompt-details">
+          <summary>Prompt</summary>
+          <p>A spectacular nighttime drone performance above a still alpine lake, viewed first from behind a small crowd and then from a smooth camera crane rising into the clear star-filled sky. Hundreds of individual lights sweep upward in coordinated arcs, changing from blue to violet to brilliant white as they assemble into giant geometric letterforms mirrored in the dark water below. The drones must render the exact text &quot;HELLO, WORLD!&quot; in crisp uppercase letters, including the comma after HELLO and the exclamation mark at the end, with accurate spelling, balanced spacing, straight alignment, and every character continuously legible during the final wide shot. The formation holds steady while subtle aurora ribbons move behind it and the reflection ripples naturally without replacing the clear primary phrase. Silhouetted viewers raise their hands in wonder. No banners, captions, logos, or other readable text appear in the scene.</p>
+        </details>
+        <button class="button is-small replay-button" type="button">Replay</button>
+      </div>
+      <div class="comparison-scroll" role="group" aria-label="Videos for prompt 22">
+        <div class="comparison-grid">
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">CF++</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">272 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/cfpp/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.mp4" data-poster="./static/posters/cfpp/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.jpg" data-src="./static/videos/cfpp/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.mp4" aria-label="CF++"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-S</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values"><span class="latency-interactive">36 ms</span> (1 GPU)<br><span class="latency-interactive">14 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours13/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.mp4" data-poster="./static/posters/ours13/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.jpg" data-src="./static/videos/ours13/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.mp4" aria-label="FastFrames-S"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">Krea-Realtime</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">1,675 ms (1 GPU)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/krea/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.mp4" data-poster="./static/posters/krea/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.jpg" data-src="./static/videos/krea/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.mp4" aria-label="Krea-Realtime"></video>
+          </figure>
+          <figure class="comparison-item">
+            <figcaption class="model-caption">
+              <span class="title is-5 model-name">FastFrames-L</span>
+              <span class="model-latency">
+                <span class="is-sr-only">Generation latency: </span>
+                <svg class="latency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="8"/><path d="M9 2h6M12 2v4m6.5 1.5 2-2M12 10v4l3 2"/></svg>
+                <span class="latency-values">158 ms (1 GPU)<br><span class="latency-interactive">45 ms</span> (8 GPUs)</span>
+              </span>
+            </figcaption>
+            <video controls muted loop playsinline preload="none" src="./static/videos/ours14/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.mp4" data-poster="./static/posters/ours14/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.jpg" data-src="./static/videos/ours14/p0108_seed108000324_a-spectacular-nighttime-drone-performance-above-a-still-alpine-lake-view_10d8b4e836.mp4" aria-label="FastFrames-L"></video>
+          </figure>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="section citation-section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title is-3">BibTeX</h2>
+    <pre tabindex="0" role="region" aria-label="BibTeX citation"><code>@article{chou2026fastframes,
+  title   = {FastFrames: Video Generation at Interactive Latency},
+  author  = {Chou, Gene and Yang, Guandao and Luan, Fujun and Mescheder, Lars and
+             Dong, Wei and Richter, Stephan R. and Koltun, Vladlen},
+  journal = {arXiv preprint},
+  year    = {2026}
+}</code></pre>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>Website template borrowed from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
