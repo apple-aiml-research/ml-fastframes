@@ -36,4 +36,5 @@ preferred-citation:
     - family-names: "Koltun"
       given-names: "Vladlen"
   year: 2026
-  journal: "arXiv preprint"
+  journal: "arXiv preprint arXiv:2611.23226"
+  url: "https://arxiv.org/abs/2611.23226"

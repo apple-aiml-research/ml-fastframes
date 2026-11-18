@@ -1,7 +1,7 @@
 # FastFrames: Video Generation at Interactive Latency
 
 [![Project Page](https://img.shields.io/badge/Project-Page-green)](https://apple-aiml-research.github.io/ml-fastframes/)
-[![arXiv](https://img.shields.io/badge/arXiv-coming_soon-b31b1b.svg)](# "Paper coming soon")
+[![arXiv](https://img.shields.io/badge/arXiv-2611.23226-b31b1b.svg)](https://arxiv.org/abs/2611.23226)
 [![FastFrames-S](https://img.shields.io/badge/%F0%9F%A4%97_Model-FastFrames--S-yellow)](https://huggingface.co/apple/FastFrames-S)
 [![FastFrames-L](https://img.shields.io/badge/%F0%9F%A4%97_Model-FastFrames--L-yellow)](https://huggingface.co/apple/FastFrames-L)
 
@@ -108,7 +108,7 @@ If you find this work useful in your research, please cite:
   title   = {FastFrames: Video Generation at Interactive Latency},
   author  = {Chou, Gene and Yang, Guandao and Luan, Fujun and Mescheder, Lars and
              Dong, Wei and Richter, Stephan R. and Koltun, Vladlen},
-  journal = {arXiv preprint},
+  journal = {arXiv preprint arXiv:2611.23226},
   year    = {2026}
 }
 ```
